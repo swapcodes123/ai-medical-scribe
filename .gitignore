@@ -1,0 +1,13 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Uploaded audio files
+backend/uploads/
+
+# Environment
+.env
+
+# OS junk
+.DS_Store
+Thumbs.db
