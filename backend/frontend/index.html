@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Medical Scribe</title>
+</head>
+<body>
+    <h2>Upload Audio</h2>
+    <input type="file" id="audio" />
+    <button onclick="upload()">Transcribe</button>
+
+    <pre id="output"></pre>
+
+    <script>
+        async function upload() {
+            const fileInput = document.getElementById("audio");
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            const response = await fetch("/transcribe", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            document.getElementById("output").innerText =
+                JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
