@@ -7,6 +7,7 @@ backend/uploads/
 
 # Environment
 .env
+node_modules/
 
 # OS junk
 .DS_Store

@@ -1,33 +1,35 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import HTMLResponse
-from nlp.medical_ai import ai_soap_summary
-
-
+from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
 
 from openai import OpenAI
-
 from stt.whisper_stt import transcribe_audio
-from nlp.soap_formatter import format_to_soap
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
-)
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI(title="AI Medical Scribe")
+
+# ✅ CORS (CRITICAL)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-@app.get("/", response_class=HTMLResponse)
-def home():
-    with open("frontend/index.html", "r") as f:
-        return f.read()
 
-def root():
-    return {"message": "AI Medical Scribe backend is running successfully"}
+@app.get("/health")
+def health():
+    return {"status": "backend running"}
+
 
 @app.post("/transcribe")
 async def transcribe(file: UploadFile = File(...)):
@@ -43,6 +45,7 @@ async def transcribe(file: UploadFile = File(...)):
         "transcript": text,
         "soap_notes": soap
     }
+
 
 def generate_soap_notes(transcription: str):
     prompt = f"""
@@ -69,4 +72,3 @@ Plan:
     )
 
     return response.choices[0].message.content
-
